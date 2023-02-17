@@ -30,15 +30,17 @@ function jwtVerify(req, res, next) {
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rtntsud.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+
 async function run() {
     try {
         const users = client.db("arkMEDIA").collection("users");
         const posts = client.db("arkMEDIA").collection("posts");
-
+       
         //user
         
         app.post("/add-users", async (req, res) => {
             const user = req.body;
+            console.log(user)
             const result = await users.insertOne(user);
             res.send(result);
         });
@@ -46,7 +48,7 @@ async function run() {
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
             const query = {
-                email: email
+                userEmail: email
             };
             const user = await users.findOne(query);
             if (user) {
@@ -79,7 +81,7 @@ async function run() {
 
         });
 
-        app.get('/get-posts',jwtVerify,verifyUser, async (req, res) => {
+        app.get('/get-posts', async (req, res) => {
             const query = {};
             const allpost = await posts.find(query).toArray();
             res.send(allpost);
@@ -96,7 +98,9 @@ async function run() {
     finally {
         
     }
-}
+};
+
+run().catch((err) => console.log(err));
 
 
 
