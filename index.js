@@ -84,17 +84,37 @@ async function run() {
     app.post("/add-post", jwtVerify, verifyUser, async (req, res) => {
       const post = req.body;
       const result = await posts.insertOne(post);
-      // const query = {};
-      // const allpost = await posts.find(query).toArray();
       res.send(result);
     });
 
+      //get post by time stamp
     app.get("/get-posts", async (req, res) => {
       const query = {};
-      const allpost = await posts.find(query).toArray();
+      const allpost = await posts.find(query).sort({ timeStamp: -1 }).toArray();
       res.send(allpost);
     });
+      
+      //get 3 post with top like
+      app.get("/get-posts/home", async (req, res) => {
+          const query = {};
+          const topThreePost = await posts.find({ $expr: { $gt: [ { $size: "$likes" }, 0 ] } })
+          .sort({ likes: -1 })
+          .limit(3)
+          .toArray();
+          res.send(topThreePost);
+      })
 
+    //get post by id
+      app.get("/get-post/:id", async (req, res) => {
+          const postId = req.params.id;
+          const query = { _id: new ObjectId(postId) };
+          const post = await posts.findOne(query);
+          res.send(post)
+      })
+      
+      
+    
+    //like post
     app.patch("/like-post/:id", async (req, res) => {
       const postId = req.params.id;
       const likerId = req.body.likerId;
