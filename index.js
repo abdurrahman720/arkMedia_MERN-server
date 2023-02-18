@@ -141,6 +141,29 @@ async function run() {
         res.send(result);
         
     });
+    
+    // comment post
+    app.patch('/add-comments/:id', async (req, res) => {
+        const comment = req.body;
+        const postId = req.params.id;
+        const query = {
+            _id: new ObjectId(postId)
+        }
+    
+        const post = await posts.findOne(query);
+        const comments = post.comments;
+        comments.push(comment)
+    
+        const updatePost = {
+            $set: {
+                comments: comments
+            }
+        }
+    
+        const result = await posts.updateOne(query, updatePost);
+        res.send(result);
+    })
+    
       
       
       
