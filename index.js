@@ -68,6 +68,9 @@ async function run() {
       const user = await users.findOne(query);
       res.send(user);
     });
+    
+      
+      
 
     //verifyUser
     const verifyUser = async (req, res, next) => {
@@ -96,7 +99,7 @@ async function run() {
       
       //get 3 post with top like
       app.get("/get-posts/home", async (req, res) => {
-          const query = {};
+  
           const topThreePost = await posts.find({ $expr: { $gt: [ { $size: "$likes" }, 0 ] } })
           .sort({ likes: -1 })
           .limit(3)
@@ -104,13 +107,25 @@ async function run() {
           res.send(topThreePost);
       })
 
-    //get post by id
+    //get post by post id
       app.get("/get-post/:id", async (req, res) => {
           const postId = req.params.id;
+          console.log(postId)
           const query = { _id: new ObjectId(postId) };
           const post = await posts.findOne(query);
-          res.send(post)
+          console.log(post)
+          res.send(post);
       })
+
+    //get post by userId
+      app.get('/get-posts/profile',async (req, res) => {
+          const userId = req.query.userId;
+          const query = { postUserId: userId };
+
+          const results = await posts.find(query).toArray();
+          res.send(results);
+
+      });
       
       
     
