@@ -39,7 +39,6 @@ async function run() {
     const posts = client.db("arkMEDIA").collection("posts");
 
     //user
-
     app.post("/add-users", async (req, res) => {
       const user = req.body;
       console.log(user);
@@ -69,6 +68,28 @@ async function run() {
       res.send(user);
     });
     
+    //edit user profile
+      app.patch('/edit-profile/:id', async (req, res) => {
+          const userId = req.params.id;
+          const updatedProfile = req.body;
+          console.log(updatedProfile);
+          const query = {_id: new ObjectId(userId)}
+
+          const update = {
+              $set: {
+                  userName: updatedProfile.userName,
+                  location: updatedProfile.location,
+                  university: updatedProfile.university
+              }
+          }
+
+          const options = {upsert: true}
+
+          const result = await users.updateOne(query, update,options)
+
+          res.send(result)
+
+      })
       
       
 
